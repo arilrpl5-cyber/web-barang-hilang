@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lost & Found School — Sistem Barang Hilang dan Ditemukan</title>
+<meta name="description" content="Platform digital sekolah untuk melaporkan, mencari, dan menemukan kembali barang yang hilang.">
+<link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar">
+  <a class="brand" href="/"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Lost &amp; Found</a>
+  <button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+  <div class="nav-links">
+    <a href="/">Home</a><a href="/reports">Cari Barang</a><a href="/reports/lost">Barang Hilang</a>
+    <a href="/reports/found">Barang Ditemukan</a><a href="#cara">Cara Kerja</a><a href="/about">Tentang</a>
+  </div>
+  <div class="nav-actions" id="navAuth">
+    <a class="icon-btn" href="/notifications" id="bellLink" title="Notifikasi"><svg class="ic"><use href="#i-bell"/></svg><span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#f4f4f5;color:#0a0a0b;font-size:10px;font-weight:700;border-radius:12px;padding:1px 6px">0</span></a>
+    <a class="btn btn-sm" href="/login">Login</a>
+    <a class="btn btn-sm btn-primary" href="/register">Daftar</a>
+  </div>
+</nav>
+<div class="container">
+  <section class="hero">
+    <span class="kicker"><span class="dot"></span> Sistem Lost &amp; Found Sekolah</span>
+    <h1>Temukan Kembali<br><span class="outline">Barangmu.</span></h1>
+    <p class="lead">Platform Lost &amp; Found sekolah untuk melaporkan, mencari, dan mengembalikan barang yang hilang.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/reports"><svg class="ic"><use href="#i-search"/></svg> Cari Barang</a>
+      <a class="btn" href="/reports/create"><svg class="ic"><use href="#i-plus"/></svg> Laporkan Barang</a>
+    </div>
+    <div class="hero-visual">
+      <div class="hv-card"><span class="tile"><svg class="ic"><use href="#i-box"/></svg></span><div><b>Ransel Hitam</b><small>DITEMUKAN — PERPUSTAKAAN — VERIFIED</small></div></div>
+      <div class="hv-card"><span class="tile"><svg class="ic"><use href="#i-tag"/></svg></span><div><b>Dompet Coklat</b><small>HILANG — KANTIN — MATCHED 87%</small></div></div>
+      <div class="hv-card"><span class="tile"><svg class="ic"><use href="#i-link"/></svg></span><div><b>Sistem Pencocokan</b><small>FIND IT — REPORT IT — RETURN IT</small></div></div>
+    </div>
+  </section>
+  <section class="stats">
+    <div class="stat"><div class="num">{{ .total }}</div><div class="lbl">Total Laporan</div></div>
+    <div class="stat"><div class="num">{{ .lost }}</div><div class="lbl">Barang Hilang</div></div>
+    <div class="stat"><div class="num">{{ .found }}</div><div class="lbl">Barang Ditemukan</div></div>
+    <div class="stat"><div class="num">{{ .returned }}</div><div class="lbl">Barang Dikembalikan</div></div>
+  </section>
+  <section class="section center">
+    <span class="kicker"><span class="dot"></span> Terbaru</span>
+    <h2>Laporan Terbaru</h2>
+    <p class="sub">Barang yang baru dilaporkan di lingkungan sekolah.</p>
+    <div class="grid" style="text-align:left">
+      {{ range .recent }}
+      <div class="card">
+        <img src="{{ if .Photo }}{{ .Photo }}{{ else }}/static/images/placeholder.svg{{ end }}" alt="{{ .ItemName }}" loading="lazy">
+        <div class="body">
+          <div class="badges"><span class="badge b-{{ .Type }}">{{ .Type }}</span><span class="badge b-{{ .Status }}">{{ .Status }}</span><span class="badge">{{ .Category.Name }}</span></div>
+          <div class="title">{{ .ItemName }}</div>
+          <div class="meta"><span><svg class="ic"><use href="#i-pin"/></svg>{{ .Location }}</span><span><svg class="ic"><use href="#i-calendar"/></svg>{{ .EventDate }}</span></div>
+          <a class="btn btn-sm" href="/reports/{{ .ID }}">Lihat Detail</a>
+        </div>
+      </div>
+      {{ else }}<p style="color:var(--text2)">Belum ada laporan.</p>{{ end }}
+    </div>
+  </section>
+  <section class="section center" id="cara">
+    <span class="kicker"><span class="dot"></span> Alur Sistem</span>
+    <h2>Cara Kerja</h2>
+    <p class="sub">Report — Verify — Match — Claim — Return</p>
+    <div class="steps" style="text-align:left">
+      <div class="step"><div class="no">/ 01</div><h3>LAPORKAN</h3><p>Laporkan barang yang hilang atau ditemukan.</p></div>
+      <div class="step"><div class="no">/ 02</div><h3>VERIFIKASI</h3><p>Admin memeriksa laporan.</p></div>
+      <div class="step"><div class="no">/ 03</div><h3>COCOKKAN</h3><p>Sistem mencari kemungkinan barang yang sesuai.</p></div>
+      <div class="step"><div class="no">/ 04</div><h3>KEMBALIKAN</h3><p>Barang dikonfirmasi dan dikembalikan.</p></div>
+    </div>
+  </section>
+  <section class="section center">
+    <span class="kicker"><span class="dot"></span> Kategori</span>
+    <h2>Jelajahi Kategori</h2>
+    <p class="sub">Telusuri berdasarkan kategori barang.</p>
+    <div class="cats" style="justify-content:center">
+      {{ range .categories }}<a class="cat" href="/reports?category_id={{ .ID }}">{{ .Name }}</a>{{ end }}
+    </div>
+  </section>
+  <section class="cta">
+    <span class="kicker"><span class="dot"></span> Butuh Bantuan</span>
+    <h2>Kehilangan sesuatu?</h2>
+    <p>Jangan khawatir. Laporkan barangmu dan biarkan sistem membantu menemukannya.</p>
+    <a class="btn btn-primary" href="/reports/create">Buat Laporan <svg class="ic"><use href="#i-arrow"/></svg></a>
+  </section>
+</div>
+<div class="marquee"><div class="marquee-track">
+  {{ range .categories }}<span><i>—</i>{{ .Name }}</span>{{ end }}
+  {{ range .categories }}<span><i>—</i>{{ .Name }}</span>{{ end }}
+</div></div>
+<footer><div class="container"><div class="cols">
+  <div><a class="brand" href="/"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Lost &amp; Found School</a>
+  <p style="margin:12px 0 0">Platform pengelolaan barang hilang dan ditemukan di lingkungan sekolah.</p></div>
+  <nav><a href="/">Home</a><a href="/reports">Cari Barang</a><a href="/about">Tentang</a><a href="/help">Bantuan</a></nav>
+</div><p style="margin-top:24px;color:var(--muted)">© 2026 Lost &amp; Found School</p></div></footer>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+initPublicNav();
+</script>
+</body></html>

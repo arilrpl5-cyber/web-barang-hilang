@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ .report.ItemName }} — Lost & Found School</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body>
+<nav class="navbar"><a class="brand" href="/"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Lost &amp; Found</a>
+<div class="nav-actions"><a class="btn btn-sm" href="/reports">Kembali</a><a class="btn btn-sm btn-primary" href="/dashboard">Dashboard</a></div></nav>
+<div class="container section">
+<div class="detail-grid">
+<div><img class="detail-img" src="{{ if .report.Photo }}{{ .report.Photo }}{{ else }}/static/images/placeholder.svg{{ end }}" alt="{{ .report.ItemName }}"></div>
+<div>
+<h1 style="margin-top:0">{{ .report.ItemName }}</h1>
+<div class="badges" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"><span class="badge b-{{ .report.Type }}">{{ .report.Type }}</span><span class="badge b-{{ .report.Status }}">{{ .report.Status }}</span><span class="badge">{{ .report.Category.Name }}</span></div>
+<div class="kv"><span>Lokasi</span><span>{{ .report.Location }}</span></div>
+<div class="kv"><span>Tanggal</span><span>{{ .report.EventDate }} {{ .report.EventTime }}</span></div>
+<div class="kv"><span>Merek</span><span>{{ .report.Brand }}</span></div>
+<div class="kv"><span>Warna</span><span>{{ .report.Color }}</span></div>
+<div class="kv"><span>Deskripsi</span><span>{{ .report.Description }}</span></div>
+<div class="kv"><span>Ciri-ciri</span><span>{{ .report.Characteristics }}</span></div>
+{{ if .report.StorageLocation }}<div class="kv"><span>Disimpan di</span><span>{{ .report.StorageLocation }}</span></div>{{ end }}
+{{ if .report.AdditionalNote }}<div class="kv"><span>Catatan</span><span>{{ .report.AdditionalNote }}</span></div>{{ end }}
+<div id="claimBox" style="margin-top:18px"></div>
+<div id="matchBox" style="margin-top:18px"></div>
+</div>
+</div>
+</div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+const reportId = location.pathname.split('/').pop();
+const reportType = "{{ .report.Type }}";
+async function init() {
+  const me = await api('/api/profile');
+  const box = document.getElementById('claimBox');
+  if (reportType === 'FOUND' && me.success) {
+    box.innerHTML = `<button class="btn btn-primary" onclick="document.getElementById('claimForm').style.display='block'">Ajukan Klaim</button>
+    <div id="claimForm" style="display:none;margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+      <b>Mengapa kamu yakin barang ini milikmu?</b>
+      <label>Penjelasan</label><textarea id="clDesc" rows="3" placeholder="Jelaskan ciri khusus barang..."></textarea>
+      <label>Bukti kepemilikan (opsional)</label><input id="clEv" placeholder="cth: foto nota, nomor seri">
+      <button class="btn btn-primary" id="clSend" style="margin-top:12px">Kirim Klaim</button>
+    </div>`;
+    document.getElementById('clSend').onclick = async () => {
+      const r = await api('/api/claims', { method: 'POST', body: JSON.stringify({ report_id: Number(reportId), description: clDesc.value, evidence: clEv.value }) });
+      toast(r.message); if (r.success) document.getElementById('claimForm').style.display = 'none';
+    };
+  } else if (reportType === 'FOUND' && !me.success) {
+    box.innerHTML = `<a class="btn btn-primary" href="/login">Login untuk Klaim</a>`;
+  }
+  // possible matches (public info minimal)
+  const m = await api('/api/matches?status=PENDING');
+}
+init();
+</script></body></html>

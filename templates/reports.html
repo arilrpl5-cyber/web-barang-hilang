@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cari Barang — Lost & Found School</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body>
+<nav class="navbar"><a class="brand" href="/"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Lost &amp; Found</a>
+<button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<div class="nav-links"><a href="/">Home</a><a href="/reports">Cari Barang</a><a href="/reports/lost">Barang Hilang</a><a href="/reports/found">Barang Ditemukan</a><a href="/about">Tentang</a></div>
+<div class="nav-actions" id="navAuth"><a class="btn btn-sm" href="/login">Login</a><a class="btn btn-sm btn-primary" href="/reports/create"><svg class="ic"><use href="#i-plus"/></svg> Laporkan</a></div></nav>
+<div class="container section">
+<span class="kicker"><span class="dot"></span> Pencarian</span>
+<h1 style="font-size:clamp(30px,4.5vw,48px);margin:16px 0 8px">Cari Barang</h1><p class="sub">Cari nama barang, filter, dan urutkan hasil.</p>
+<div class="filters">
+<input id="fSearch" placeholder="Cari nama barang..." style="flex:1;min-width:200px">
+<select id="fType"><option value="">Semua Jenis</option><option value="LOST">Hilang</option><option value="FOUND">Ditemukan</option></select>
+<select id="fCategory"><option value="">Semua Kategori</option></select>
+<input id="fLocation" placeholder="Lokasi" style="max-width:150px">
+<select id="fStatus"><option value="">Semua Status</option><option>VERIFIED</option><option>PROCESSING</option><option>MATCHED</option><option>RETURNED</option></select>
+<select id="fSort"><option value="newest">Terbaru</option><option value="oldest">Terlama</option><option value="az">A-Z</option><option value="za">Z-A</option></select>
+</div>
+<div class="grid" id="resultGrid"></div>
+<div class="empty" id="emptyState" style="display:none"><span class="big-ic"><svg class="ic"><use href="#i-search"/></svg></span><h3>Barang tidak ditemukan.</h3><p>Coba gunakan kata kunci atau filter yang berbeda.</p></div>
+<div class="pagination" id="pagination"></div>
+</div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script><script src="/static/js/search.js"></script>
+<script>initPublicNav();</script></body></html>

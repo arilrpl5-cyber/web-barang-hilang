@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matching — Admin</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="layout">
+<aside class="sidebar"><a class="brand" href="/admin"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Admin</a>
+<a href="/admin"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/admin/reports"><svg class="ic"><use href="#i-file"/></svg> Laporan</a><a href="/admin/claims"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim</a><a href="/admin/matches" class="active"><svg class="ic"><use href="#i-link"/></svg> Matching</a><a href="/admin/users"><svg class="ic"><use href="#i-users"/></svg> Pengguna</a><a href="/admin/categories"><svg class="ic"><use href="#i-tag"/></svg> Kategori</a><a href="/admin/activity-logs"><svg class="ic"><use href="#i-activity"/></svg> Activity Logs</a><a href="/admin/settings"><svg class="ic"><use href="#i-sliders"/></svg> Pengaturan</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a></aside>
+<div class="main"><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<div class="page-head"><h1>Matching</h1><button class="btn btn-primary btn-sm" id="btnRun"><svg class="ic"><use href="#i-play"/></svg> Jalankan Matching</button></div>
+<p style="color:var(--muted);font-size:13px">Hasil pencocokan merupakan rekomendasi sistem dan tidak menjamin kepemilikan barang.</p>
+<div id="list"></div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+async function load(){
+  const r=await api('/api/matches');
+  const el=document.getElementById('list');
+  if(!r.success||!r.data.length){el.innerHTML='<div class="empty"><h3>Belum ada hasil matching.</h3><p>Klik "Jalankan Matching" untuk menghitung.</p></div>';return;}
+  el.innerHTML=r.data.map(m=>{const lbl=m.score>=70?'Kemungkinan cocok':(m.score>=40?'Mungkin cocok':'Kemungkinan rendah');
+  return `<div class="notif"><div style="flex:1"><b>${m.lost_report?.item_name||'#'+m.lost_report_id}</b> ↔ <b>${m.found_report?.item_name||'#'+m.found_report_id}</b> ${badge(m.status)}<div style="color:var(--text2);font-size:13px">Score: ${Math.round(m.score)}% — ${lbl}</div><div style="color:var(--muted);font-size:12px">${fmtDate(m.created_at)}</div></div>
+  <div style="display:flex;gap:6px"><button class="btn btn-sm" onclick="upd(${m.id},'CONFIRMED')">Confirm</button><button class="btn btn-sm" onclick="upd(${m.id},'REJECTED')">Reject</button></div></div>`;}).join('');
+}
+async function upd(id,status){const r=await api('/api/matches/'+id,{method:'PUT',body:JSON.stringify({status})});toast(r.message);load();}
+document.getElementById('btnRun').onclick=async()=>{const r=await api('/api/matches/run',{method:'POST'});toast(r.message+` (${r.data?.new_matches||0} baru)`);load();};
+load();
+</script></body></html>

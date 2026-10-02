@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pengaturan — Admin</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="layout">
+<aside class="sidebar"><a class="brand" href="/admin"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Admin</a>
+<a href="/admin"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/admin/reports"><svg class="ic"><use href="#i-file"/></svg> Laporan</a><a href="/admin/claims"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim</a><a href="/admin/matches"><svg class="ic"><use href="#i-link"/></svg> Matching</a><a href="/admin/users"><svg class="ic"><use href="#i-users"/></svg> Pengguna</a><a href="/admin/categories"><svg class="ic"><use href="#i-tag"/></svg> Kategori</a><a href="/admin/activity-logs"><svg class="ic"><use href="#i-activity"/></svg> Activity Logs</a><a href="/admin/settings" class="active"><svg class="ic"><use href="#i-sliders"/></svg> Pengaturan</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a></aside>
+<div class="main"><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<h1>Pengaturan</h1>
+<div class="form-card" style="max-width:520px">
+<label>Nama sekolah</label><input id="school_name"><label>Nama aplikasi</label><input id="app_name">
+<label>Email admin</label><input id="admin_email"><label>Batas upload (MB)</label><input id="max_upload_mb" type="number">
+<label>Pagination default</label><input id="default_limit" type="number">
+<button class="btn btn-primary" id="btnSave" style="margin-top:14px">Simpan Pengaturan</button></div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+(async()=>{
+  const r=await api('/api/admin/settings');
+  if(r.success){for(const[k,v]of Object.entries(r.data)){const el=document.getElementById(k);if(el)el.value=v;}}
+})();
+btnSave.onclick=async()=>{
+  const body={school_name:school_name.value,app_name:app_name.value,admin_email:admin_email.value,max_upload_mb:max_upload_mb.value,default_limit:default_limit.value};
+  const r=await api('/api/admin/settings',{method:'PUT',body:JSON.stringify(body)});toast(r.message);
+};
+</script></body></html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Lost & Found School</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="auth-wrap">
+<div class="auth-left"><a class="brand" href="/"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Lost &amp; Found</a>
+<span class="kicker" style="margin-top:26px;align-self:flex-start"><span class="dot"></span> Selamat Datang</span>
+<h1>Temukan Kembali<br><span class="outline">Barangmu.</span></h1>
+<p style="color:var(--text2)">Find it. Report it. Return it.</p></div>
+<div class="auth-right"><div class="form-card">
+<h2>Login</h2><p style="color:var(--text2);font-size:14px">Masuk ke akun Lost &amp; Found School.</p>
+<form id="loginForm">
+<label for="email">Email</label><input id="email" type="email" required placeholder="nama@school.local" autocomplete="email">
+<label for="password">Password</label><input id="password" type="password" required placeholder="••••••••" autocomplete="current-password">
+<div style="margin:12px 0;font-size:14px;color:var(--text2)"><input type="checkbox" id="remember" style="width:auto"> <label for="remember" style="display:inline">Remember me</label></div>
+<button class="btn btn-primary" id="btnLogin" style="width:100%">Login</button>
+</form>
+<p style="font-size:14px;color:var(--text2)">Belum punya akun? <a href="/register" style="color:#fff;text-decoration:underline">Daftar</a></p>
+<p style="font-size:12px;color:var(--muted)">Demo: admin@school.local / Admin123! • user@school.local / User123!</p>
+</div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('btnLogin');
+  btn.textContent = 'Mengirim...'; btn.disabled = true;
+  const r = await api('/api/login', { method: 'POST', body: JSON.stringify({ email: email.value, password: password.value }) });
+  if (r.success) {
+    btn.textContent = 'Berhasil'; toast('Login berhasil');
+    const next = new URLSearchParams(location.search).get('next');
+    const safeNext = (next && next.startsWith('/') && !next.startsWith('//')) ? next : null;
+    location.href = safeNext || (r.data.user.role === 'ADMIN' ? '/admin' : '/dashboard');
+  }
+  else { toast(r.message || 'Gagal login'); btn.textContent = 'Login'; btn.disabled = false; }
+});
+</script></body></html>

@@ -1,0 +1,10 @@
+.env
+data.db
+data.db-shm
+data.db-wal
+*.db-shm
+*.db-wal
+uploads/*
+!uploads/.gitkeep
+lost-found-school.exe
+lost-found-school

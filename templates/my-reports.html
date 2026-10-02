@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laporan Saya — Lost & Found School</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="layout">
+<aside class="sidebar"><a class="brand" href="/"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> L&amp;F School</a>
+<a href="/dashboard"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/reports"><svg class="ic"><use href="#i-search"/></svg> Cari Barang</a><a href="/reports/create"><svg class="ic"><use href="#i-plus"/></svg> Buat Laporan</a><a href="/my-reports" class="active"><svg class="ic"><use href="#i-file"/></svg> Laporan Saya</a><a href="/claims"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim Saya</a><a href="/notifications"><svg class="ic"><use href="#i-bell"/></svg> Notifikasi</a><a href="/profile"><svg class="ic"><use href="#i-user"/></svg> Profil</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a></aside>
+<div class="main"><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<h1>Laporan Saya</h1><div class="table-wrap"><table><thead><tr><th>ID</th><th>Foto</th><th>Barang</th><th>Jenis</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tb"><tr><td colspan="7">Memuat...</td></tr></tbody></table></div>
+<div class="pagination" id="pg"></div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script src="/static/js/edit-report.js"></script>
+<script>
+let page=1;
+async function load(p=1){page=p;
+  const r=await api(`/api/my-reports?page=${p}&limit=10`);
+  const tb=document.getElementById('tb');
+  if(!r.success||!r.data.length){tb.innerHTML='<tr><td colspan="7">Belum ada laporan. <a href="/reports/create" style="text-decoration:underline">Buat Laporan</a></td></tr>';return;}
+  tb.innerHTML=r.data.map(it=>`<tr><td>${it.id}</td><td><img src="${imgSrc(it.photo)}" style="width:48px;height:48px;object-fit:cover;border-radius:8px" alt=""></td><td>${it.item_name}</td><td>${badge(it.type)}</td><td>${fmtDate(it.created_at)}</td><td>${badge(it.status)}</td>
+  <td style="white-space:nowrap"><a class="btn btn-sm" href="/reports/${it.id}">Detail</a> <button class="btn btn-sm" onclick="openEditModal(${it.id},()=>load(page))">Edit</button> <button class="btn btn-sm" onclick="delR(${it.id})">Hapus</button></td></tr>`).join('');
+  const m=r.meta||{pages:1,page:1};const pg=document.getElementById('pg');pg.innerHTML='';
+  for(let i=1;i<=m.pages;i++){const b=document.createElement('button');b.textContent=i;if(i===m.page)b.className='active';b.onclick=()=>load(i);pg.appendChild(b);}
+}
+async function delR(id){confirmModal('Apakah kamu yakin ingin menghapus laporan ini?',async()=>{const r=await api('/api/reports/'+id,{method:'DELETE'});toast(r.message);load(page);});}
+load();
+</script></body></html>

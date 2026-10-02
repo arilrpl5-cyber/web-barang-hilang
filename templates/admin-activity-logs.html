@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity Logs — Admin</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="layout">
+<aside class="sidebar"><a class="brand" href="/admin"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Admin</a>
+<a href="/admin"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/admin/reports"><svg class="ic"><use href="#i-file"/></svg> Laporan</a><a href="/admin/claims"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim</a><a href="/admin/matches"><svg class="ic"><use href="#i-link"/></svg> Matching</a><a href="/admin/users"><svg class="ic"><use href="#i-users"/></svg> Pengguna</a><a href="/admin/categories"><svg class="ic"><use href="#i-tag"/></svg> Kategori</a><a href="/admin/activity-logs" class="active"><svg class="ic"><use href="#i-activity"/></svg> Activity Logs</a><a href="/admin/settings"><svg class="ic"><use href="#i-sliders"/></svg> Pengaturan</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a></aside>
+<div class="main"><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<h1>Activity Logs</h1>
+<div class="table-wrap"><table><thead><tr><th>User</th><th>Activity</th><th>Description</th><th>IP</th><th>Date</th><th>Time</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="pagination" id="pg"></div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+async function load(p=1){
+  const r=await api('/api/admin/activity-logs?page='+p+'&limit=15');
+  const rows=(r.data||[]).map(a=>{const d=new Date(a.created_at);return `<tr><td>${a.user?.name||'-'}</td><td>${badge(a.action)}</td><td>${a.description||''}</td><td>${a.ip_address||'-'}</td><td>${d.toLocaleDateString('id-ID')}</td><td>${d.toLocaleTimeString('id-ID')}</td></tr>`;}).join('');
+  document.getElementById('tb').innerHTML=rows||'<tr><td colspan="6">Belum ada aktivitas.</td></tr>';
+  const m=r.meta||{pages:1,page:1};const pg=document.getElementById('pg');pg.innerHTML='';
+  for(let i=1;i<=m.pages;i++){const b=document.createElement('button');b.textContent=i;if(i===m.page)b.className='active';b.onclick=()=>load(i);pg.appendChild(b);}
+}
+load();
+</script></body></html>

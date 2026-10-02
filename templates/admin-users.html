@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelola Pengguna — Admin</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="layout">
+<aside class="sidebar"><a class="brand" href="/admin"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Admin</a>
+<a href="/admin"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/admin/reports"><svg class="ic"><use href="#i-file"/></svg> Laporan</a><a href="/admin/claims"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim</a><a href="/admin/matches"><svg class="ic"><use href="#i-link"/></svg> Matching</a><a href="/admin/users" class="active"><svg class="ic"><use href="#i-users"/></svg> Pengguna</a><a href="/admin/categories"><svg class="ic"><use href="#i-tag"/></svg> Kategori</a><a href="/admin/activity-logs"><svg class="ic"><use href="#i-activity"/></svg> Activity Logs</a><a href="/admin/settings"><svg class="ic"><use href="#i-sliders"/></svg> Pengaturan</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a></aside>
+<div class="main"><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<h1>Kelola Pengguna</h1>
+<div class="filters"><input id="s" placeholder="Cari nama / email / NIS..."><select id="role"><option value="">Semua Role</option><option>USER</option><option>ADMIN</option></select><select id="st"><option value="">Semua Status</option><option>ACTIVE</option><option>INACTIVE</option><option>BANNED</option></select><button class="btn btn-sm" onclick="load(1)">Cari</button></div>
+<div class="table-wrap"><table><thead><tr><th>Nama</th><th>NIS/NISN</th><th>Email</th><th>Role</th><th>Status</th><th>Terdaftar</th><th>Aksi</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="pagination" id="pg"></div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+async function load(p=1){
+  const r=await api(`/api/admin/users?page=${p}&limit=10&search=${s.value}&role=${role.value}&status=${st.value}`);
+  const tb=document.getElementById('tb');
+  if(!r.success||!r.data.length){tb.innerHTML='<tr><td colspan="7">Tidak ada pengguna.</td></tr>';return;}
+  tb.innerHTML=r.data.map(u=>`<tr><td>${u.name}</td><td>${u.nis_nisn}</td><td>${u.email}</td><td>${badge(u.role)}</td><td>${badge(u.status)}</td><td>${fmtDate(u.created_at)}</td>
+  <td style="white-space:nowrap"><button class="btn btn-sm" onclick="setRole(${u.id},'${u.role==='ADMIN'?'USER':'ADMIN'}')">${u.role==='ADMIN'?'Jadikan User':'Jadikan Admin'}</button> <button class="btn btn-sm" onclick="setStatus(${u.id},'${u.status==='ACTIVE'?'INACTIVE':'ACTIVE'}')">${u.status==='ACTIVE'?'Nonaktifkan':'Aktifkan'}</button> <button class="btn btn-sm" onclick="del(${u.id})">Hapus</button></td></tr>`).join('');
+  const m=r.meta||{pages:1,page:1};const pg=document.getElementById('pg');pg.innerHTML='';
+  for(let i=1;i<=m.pages;i++){const b=document.createElement('button');b.textContent=i;if(i===m.page)b.className='active';b.onclick=()=>load(i);pg.appendChild(b);}
+}
+async function setRole(id,role){const r=await api('/api/admin/users/'+id,{method:'PUT',body:JSON.stringify({role})});toast(r.message);load();}
+async function setStatus(id,status){const r=await api('/api/admin/users/'+id,{method:'PUT',body:JSON.stringify({status})});toast(r.message);load();}
+async function del(id){confirmModal('Hapus user ini?',async()=>{const r=await api('/api/admin/users/'+id,{method:'DELETE'});toast(r.message);load();});}
+load();
+</script></body></html>

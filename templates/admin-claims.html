@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelola Klaim — Admin</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="layout">
+<aside class="sidebar"><a class="brand" href="/admin"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Admin</a>
+<a href="/admin"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/admin/reports"><svg class="ic"><use href="#i-file"/></svg> Laporan</a><a href="/admin/claims" class="active"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim</a><a href="/admin/matches"><svg class="ic"><use href="#i-link"/></svg> Matching</a><a href="/admin/users"><svg class="ic"><use href="#i-users"/></svg> Pengguna</a><a href="/admin/categories"><svg class="ic"><use href="#i-tag"/></svg> Kategori</a><a href="/admin/activity-logs"><svg class="ic"><use href="#i-activity"/></svg> Activity Logs</a><a href="/admin/settings"><svg class="ic"><use href="#i-sliders"/></svg> Pengaturan</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a></aside>
+<div class="main"><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<h1>Kelola Klaim</h1>
+<div class="filters"><select id="st"><option value="">Semua</option><option>PENDING</option><option>REVIEWING</option><option>APPROVED</option><option>REJECTED</option></select><button class="btn btn-sm" onclick="load()">Filter</button></div>
+<div id="list"></div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+async function load(){
+  const r=await api('/api/admin/claims?status='+document.getElementById('st').value);
+  const el=document.getElementById('list');
+  if(!r.success||!r.data.length){el.innerHTML='<div class="empty"><h3>Belum ada klaim.</h3></div>';return;}
+  el.innerHTML=r.data.map(c=>`<div class="notif"><div style="flex:1"><b>${c.report?.item_name}</b> ${badge(c.status)}<div>Pengklaim: ${c.user?.name} (${c.user?.email})</div><div style="color:var(--text2);font-size:13px">${c.description}</div>${c.evidence?`<div style="font-size:13px">Bukti: ${c.evidence}</div>`:''}<div style="color:var(--muted);font-size:12px">${fmtDate(c.created_at)}</div></div>
+  <div style="display:flex;gap:6px"><button class="btn btn-sm btn-primary" onclick="review(${c.id},'APPROVED')">Approve</button><button class="btn btn-sm" onclick="review(${c.id},'REJECTED')">Reject</button></div></div>`).join('');
+}
+async function review(id,status){
+  let note='';
+  if(status==='REJECTED'){note=prompt('Alasan penolakan (wajib):');if(!note){toast('Harap lengkapi semua field.','warn');return;}}
+  else note=prompt('Catatan admin (opsional):')||'';
+  const r=await api('/api/admin/claims/'+id,{method:'PUT',body:JSON.stringify({status,admin_note:note})});
+  toast(r.message);load();
+}
+load();
+</script></body></html>

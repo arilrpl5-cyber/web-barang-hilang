@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buat Laporan — Lost & Found School</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body>
+<nav class="navbar"><a class="brand" href="/dashboard"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Lost &amp; Found</a>
+<div class="nav-actions"><a class="btn btn-sm" href="/dashboard">Dashboard</a></div></nav>
+<div class="container section" style="max-width:720px">
+<span class="kicker"><span class="dot"></span> Laporan Baru</span>
+<h1 style="font-size:clamp(30px,4.5vw,46px);margin:16px 0 8px">Buat Laporan</h1><p class="sub">Laporkan barang hilang atau ditemukan.</p>
+<div style="display:flex;gap:10px;margin-bottom:18px">
+<button class="btn" id="tLost">Barang Hilang</button><button class="btn" id="tFound">Barang Ditemukan</button>
+</div>
+<form id="repForm" enctype="multipart/form-data">
+<input type="hidden" id="rtype" value="LOST">
+<label>Nama barang *</label><input id="item_name" required placeholder="cth: Dompet Hitam">
+<label>Kategori</label><select id="category_id"><option value="">-- Pilih --</option></select>
+<label>Foto (JPG/PNG/WEBP, maks 5MB)</label><input type="file" id="photo" accept=".jpg,.jpeg,.png,.webp">
+<img id="preview" style="display:none;max-width:220px;border-radius:10px;margin-top:10px;border:1px solid var(--border)" alt="preview">
+<div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn btn-sm" id="chgPhoto" style="display:none">Ganti Foto</button><button type="button" class="btn btn-sm" id="delPhoto" style="display:none">Hapus Foto</button></div>
+<div class="detail-grid">
+<div><label>Merek</label><input id="brand"><label>Warna</label><input id="color"><label id="locLabel">Lokasi terakhir</label><input id="location"><label>Tanggal</label><input id="event_date" type="date"></div>
+<div><label>Perkiraan waktu</label><input id="event_time" type="time"><label id="storeLabel">Tempat penyimpanan sementara</label><input id="storage_location" placeholder="Khusus barang ditemukan"><label>Catatan tambahan</label><textarea id="additional_note" rows="2"></textarea></div>
+</div>
+<label>Deskripsi</label><textarea id="description" rows="3"></textarea>
+<label>Ciri-ciri khusus</label><textarea id="characteristics" rows="2"></textarea>
+<button class="btn btn-primary" id="btnSend" style="width:100%;margin-top:16px">Kirim Laporan</button>
+</form></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+let curType = new URLSearchParams(location.search).get('type') || 'LOST';
+const rt = document.getElementById('rtype');
+function setType(t){curType=t;rt.value=t;
+  tLost.className='btn'+(t==='LOST'?' btn-primary':'');tFound.className='btn'+(t==='FOUND'?' btn-primary':'');
+  locLabel.textContent = t==='LOST'?'Lokasi terakhir':'Lokasi ditemukan';}
+tLost.onclick=()=>setType('LOST');tFound.onclick=()=>setType('FOUND');setType(curType);
+api('/api/categories').then(r=>{if(r.success)r.data.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;category_id.appendChild(o);});});
+photo.addEventListener('change',()=>{const f=photo.files[0];if(!f)return;preview.src=URL.createObjectURL(f);preview.style.display='block';chgPhoto.style.display='';delPhoto.style.display='';});
+chgPhoto.onclick=()=>photo.click();delPhoto.onclick=()=>{photo.value='';preview.style.display='none';chgPhoto.style.display='none';delPhoto.style.display='none';};
+document.getElementById('repForm').addEventListener('submit',async e=>{
+  e.preventDefault();const btn=document.getElementById('btnSend');btn.textContent='Mengirim...';btn.disabled=true;
+  const fd=new FormData();fd.append('type',curType);
+  ['item_name','description','brand','color','characteristics','location','event_date','event_time','storage_location','additional_note'].forEach(id=>fd.append(id,document.getElementById(id).value));
+  if(category_id.value)fd.append('category_id',category_id.value);
+  if(photo.files[0])fd.append('photo',photo.files[0]);
+  const res=await fetch('/api/reports',{method:'POST',body:fd,credentials:'include'});
+  const r=await res.json();
+  if(r.success){btn.textContent='Berhasil';toast('Laporan berhasil dibuat.');location.href='/my-reports';}
+  else{toast(r.message||'Gagal menyimpan laporan.');btn.textContent='Kirim Laporan';btn.disabled=false;}
+});
+</script></body></html>

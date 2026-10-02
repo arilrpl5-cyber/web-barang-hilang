@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Lost & Found School</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="layout">
+<aside class="sidebar"><a class="brand" href="/admin"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Admin</a>
+<a href="/admin" class="active"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/admin/reports"><svg class="ic"><use href="#i-file"/></svg> Laporan</a><a href="/admin/claims"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim</a><a href="/admin/matches"><svg class="ic"><use href="#i-link"/></svg> Matching</a><a href="/admin/users"><svg class="ic"><use href="#i-users"/></svg> Pengguna</a><a href="/admin/categories"><svg class="ic"><use href="#i-tag"/></svg> Kategori</a><a href="/admin/activity-logs"><svg class="ic"><use href="#i-activity"/></svg> Activity Logs</a><a href="/admin/settings"><svg class="ic"><use href="#i-sliders"/></svg> Pengaturan</a><a href="/" target="_blank"><svg class="ic"><use href="#i-globe"/></svg> Lihat Situs</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a></aside>
+<div class="main"><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<h1>Admin Dashboard</h1><p class="sub" style="color:var(--text2)">Statistik, grafik, laporan terbaru & aktivitas.</p>
+<div class="stats" id="adminStats" style="grid-template-columns:repeat(4,1fr)"><p style="color:var(--text2)">Memuat...</p></div>
+<div class="detail-grid">
+<div><h3>Laporan per Bulan</h3><div class="card"><div class="body"><div id="chartBars" style="display:flex;gap:8px;align-items:flex-end;min-height:150px"></div></div></div>
+<h3 style="margin-top:20px">Laporan Terbaru</h3><div class="table-wrap"><table><thead><tr><th>Barang</th><th>Jenis</th><th>Status</th><th>Tanggal</th></tr></thead><tbody id="adminRecent"></tbody></table></div></div>
+<div><h3>Aktivitas Terbaru</h3><div id="adminActivity"></div></div>
+</div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script><script src="/static/js/dashboard.js"></script></body></html>

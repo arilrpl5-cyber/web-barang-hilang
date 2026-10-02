@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar — Lost & Found School</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="auth-wrap">
+<div class="auth-left"><a class="brand" href="/"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Lost &amp; Found</a>
+<span class="kicker" style="margin-top:26px;align-self:flex-start"><span class="dot"></span> Akun Baru</span>
+<h1>Buat Akun<br><span class="outline">Baru.</span></h1>
+<p style="color:var(--text2)">Find it. Report it. Return it.</p></div>
+<div class="auth-right"><div class="form-card">
+<h2>Daftar</h2><p style="color:var(--text2);font-size:14px">Buat akun untuk melaporkan barang.</p>
+<form id="regForm">
+<label for="name">Nama lengkap</label><input id="name" required placeholder="Nama kamu">
+<label for="nis">NIS/NISN</label><input id="nis" required placeholder="NIS/NISN">
+<label for="email">Email</label><input id="email" type="email" required placeholder="nama@school.local">
+<label for="password">Password (min. 8 karakter)</label><input id="password" type="password" required minlength="8">
+<label for="confirm">Konfirmasi password</label><input id="confirm" type="password" required>
+<button class="btn btn-primary" id="btnReg" style="width:100%;margin-top:16px">Daftar</button>
+</form>
+<p style="font-size:14px;color:var(--text2)">Sudah punya akun? <a href="/login" style="color:#fff;text-decoration:underline">Login</a></p>
+</div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+document.getElementById('regForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('btnReg');
+  btn.textContent = 'Mengirim...'; btn.disabled = true;
+  const r = await api('/api/register', { method: 'POST', body: JSON.stringify({
+    name: name.value, nis_nisn: nis.value, email: email.value, password: password.value, confirm_password: confirm.value }) });
+  if (r.success) {
+    btn.textContent = 'Berhasil'; toast('Pendaftaran berhasil, silakan login');
+    const next = new URLSearchParams(location.search).get('next');
+    location.href = '/login' + ((next && next.startsWith('/') && !next.startsWith('//')) ? '?next=' + encodeURIComponent(next) : '');
+  }
+  else { toast(r.message || 'Gagal mendaftar'); btn.textContent = 'Daftar'; btn.disabled = false; }
+});
+</script></body></html>

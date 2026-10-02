@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Lost & Found School</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body>
+<div class="layout">
+<aside class="sidebar" id="sb">
+<a class="brand" href="/" style="margin-bottom:16px"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> L&amp;F School</a>
+<a href="/dashboard" class="active"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/reports"><svg class="ic"><use href="#i-search"/></svg> Cari Barang</a>
+<a href="/reports/lost"><svg class="ic"><use href="#i-box"/></svg> Barang Hilang</a><a href="/reports/found"><svg class="ic"><use href="#i-inbox"/></svg> Barang Ditemukan</a>
+<a href="/reports/create"><svg class="ic"><use href="#i-plus"/></svg> Buat Laporan</a><a href="/my-reports"><svg class="ic"><use href="#i-file"/></svg> Laporan Saya</a>
+<a href="/claims"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim Saya</a><a href="/notifications"><svg class="ic"><use href="#i-bell"/></svg> Notifikasi <span id="notifBadge" class="badge" style="display:none">0</span></a>
+<a href="/profile"><svg class="ic"><use href="#i-user"/></svg> Profil</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a>
+</aside>
+<div class="main">
+<div class="page-head"><div><h1>Dashboard</h1><p style="color:var(--text2);margin:6px 0 0">Selamat datang, {{ .user.Name }}</p></div><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button></div>
+<div class="qactions">
+<a class="btn btn-primary" href="/reports/create?type=LOST"><svg class="ic"><use href="#i-plus"/></svg> Laporkan Barang Hilang</a>
+<a class="btn" href="/reports/create?type=FOUND"><svg class="ic"><use href="#i-plus"/></svg> Laporkan Barang Ditemukan</a>
+<a class="btn" href="/reports"><svg class="ic"><use href="#i-search"/></svg> Cari Barang</a></div>
+<div class="stat-row">
+<div class="stat"><div class="num">{{ .lost }}</div><div class="lbl">Laporan Hilang Saya</div></div>
+<div class="stat"><div class="num">{{ .found }}</div><div class="lbl">Laporan Ditemukan Saya</div></div>
+<div class="stat"><div class="num">{{ .processing }}</div><div class="lbl">Sedang Diproses</div></div>
+<div class="stat"><div class="num">{{ .done }}</div><div class="lbl">Selesai</div></div>
+</div>
+<div class="detail-grid">
+<div><h3>Laporan Terbaru Saya</h3><div class="table-wrap"><table><thead><tr><th>Barang</th><th>Jenis</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="recentTable"><tr><td colspan="5">Memuat...</td></tr></tbody></table></div></div>
+<div><h3>Kemungkinan Barang Cocok</h3><div id="matchList"><p style="color:var(--text2)">Memuat...</p></div></div>
+</div>
+</div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script><script src="/static/js/dashboard.js"></script></body></html>

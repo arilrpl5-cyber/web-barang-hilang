@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelola Laporan — Admin</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="layout">
+<aside class="sidebar"><a class="brand" href="/admin"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Admin</a>
+<a href="/admin"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/admin/reports" class="active"><svg class="ic"><use href="#i-file"/></svg> Laporan</a><a href="/admin/claims"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim</a><a href="/admin/matches"><svg class="ic"><use href="#i-link"/></svg> Matching</a><a href="/admin/users"><svg class="ic"><use href="#i-users"/></svg> Pengguna</a><a href="/admin/categories"><svg class="ic"><use href="#i-tag"/></svg> Kategori</a><a href="/admin/activity-logs"><svg class="ic"><use href="#i-activity"/></svg> Activity Logs</a><a href="/admin/settings"><svg class="ic"><use href="#i-sliders"/></svg> Pengaturan</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a></aside>
+<div class="main"><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<h1>Kelola Laporan</h1>
+<div class="filters"><input id="s" placeholder="Cari barang / lokasi..."><select id="t"><option value="">Semua Jenis</option><option>LOST</option><option>FOUND</option></select>
+<select id="st"><option value="">Semua Status</option><option>PENDING</option><option>VERIFIED</option><option>PROCESSING</option><option>MATCHED</option><option>RETURNED</option><option>REJECTED</option></select>
+<button class="btn btn-sm" onclick="load(1)">Cari</button></div>
+<div class="table-wrap"><table><thead><tr><th>ID</th><th>Barang</th><th>Pelapor</th><th>Jenis</th><th>Lokasi</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="tb"></tbody></table></div>
+<div class="pagination" id="pg"></div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script src="/static/js/edit-report.js"></script>
+<script>
+async function load(p=1){
+  const r=await api(`/api/admin/reports?page=${p}&limit=10&search=${s.value}&type=${t.value}&status=${st.value}`);
+  const tb=document.getElementById('tb');
+  if(!r.success||!r.data.length){tb.innerHTML='<tr><td colspan="8">Belum ada laporan.</td></tr>';return;}
+  tb.innerHTML=r.data.map(it=>`<tr><td>${it.id}</td><td>${it.item_name}</td><td>${it.user?.name||'-'}</td><td>${badge(it.type)}</td><td>${it.location||'-'}</td><td>${fmtDate(it.created_at)}</td><td>${badge(it.status)}</td>
+  <td style="white-space:nowrap"><a class="btn btn-sm" href="/reports/${it.id}">Detail</a> <button class="btn btn-sm" onclick="openEditModal(${it.id},()=>load(1))">Edit</button> <button class="btn btn-sm" onclick="verify(${it.id})">Verify</button> <button class="btn btn-sm" onclick="reject(${it.id})">Reject</button> <button class="btn btn-sm" onclick="del(${it.id})">Hapus</button></td></tr>`).join('');
+  const m=r.meta||{pages:1,page:1};const pg=document.getElementById('pg');pg.innerHTML='';
+  for(let i=1;i<=m.pages;i++){const b=document.createElement('button');b.textContent=i;if(i===m.page)b.className='active';b.onclick=()=>load(i);pg.appendChild(b);}
+}
+async function verify(id){const r=await api('/api/admin/reports/'+id+'/status',{method:'PUT',body:JSON.stringify({status:'VERIFIED'})});toast(r.message);load();}
+async function reject(id){const reason=prompt('Alasan penolakan (wajib):');if(!reason)return;const r=await api('/api/admin/reports/'+id+'/status',{method:'PUT',body:JSON.stringify({status:'REJECTED',reason})});toast(r.message);load();}
+async function del(id){confirmModal('Hapus laporan ini?',async()=>{const r=await api('/api/admin/reports/'+id,{method:'DELETE'});toast(r.message);load();});}
+load();
+</script></body></html>

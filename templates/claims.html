@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klaim Saya — Lost & Found School</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="layout">
+<aside class="sidebar"><a class="brand" href="/"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> L&amp;F School</a>
+<a href="/dashboard"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/reports"><svg class="ic"><use href="#i-search"/></svg> Cari Barang</a><a href="/my-reports"><svg class="ic"><use href="#i-file"/></svg> Laporan Saya</a><a href="/claims" class="active"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim Saya</a><a href="/notifications"><svg class="ic"><use href="#i-bell"/></svg> Notifikasi</a><a href="/profile"><svg class="ic"><use href="#i-user"/></svg> Profil</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a></aside>
+<div class="main"><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<h1>Klaim Saya</h1><div id="list"><p style="color:var(--text2)">Memuat...</p></div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+(async()=>{
+  const r=await api('/api/my-claims');
+  const el=document.getElementById('list');
+  if(!r.success||!r.data.length){el.innerHTML='<div class="empty"><h3>Belum ada klaim.</h3><p>Cari barang ditemukan lalu ajukan klaim.</p><a class="btn btn-primary" href="/reports/found">Lihat Barang Ditemukan</a></div>';return;}
+  el.innerHTML=r.data.map(c=>`<div class="notif"><div style="flex:1"><b>${c.report?.item_name||'Report #'+c.report_id}</b> ${badge(c.status)}<div style="color:var(--text2);font-size:13px">${c.description}</div>${c.admin_note?`<div style="font-size:13px">Catatan admin: ${c.admin_note}</div>`:''}<div style="color:var(--muted);font-size:12px">${fmtDate(c.created_at)}</div></div><a class="btn btn-sm" href="/reports/${c.report_id}">Lihat Barang</a></div>`).join('');
+})();
+</script></body></html>

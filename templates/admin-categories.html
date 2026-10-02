@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelola Kategori — Admin</title><link rel="icon" href="/static/images/favicon.svg">
+<link rel="stylesheet" href="/static/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body><div class="layout">
+<aside class="sidebar"><a class="brand" href="/admin"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span> Admin</a>
+<a href="/admin"><svg class="ic"><use href="#i-grid"/></svg> Dashboard</a><a href="/admin/reports"><svg class="ic"><use href="#i-file"/></svg> Laporan</a><a href="/admin/claims"><svg class="ic"><use href="#i-clipboard"/></svg> Klaim</a><a href="/admin/matches"><svg class="ic"><use href="#i-link"/></svg> Matching</a><a href="/admin/users"><svg class="ic"><use href="#i-users"/></svg> Pengguna</a><a href="/admin/categories" class="active"><svg class="ic"><use href="#i-tag"/></svg> Kategori</a><a href="/admin/activity-logs"><svg class="ic"><use href="#i-activity"/></svg> Activity Logs</a><a href="/admin/settings"><svg class="ic"><use href="#i-sliders"/></svg> Pengaturan</a><a href="#" onclick="logout()"><svg class="ic"><use href="#i-logout"/></svg> Logout</a></aside>
+<div class="main"><button class="hamburger" id="hamburger"><svg class="ic"><use href="#i-menu"/></svg></button>
+<h1>Kelola Kategori</h1>
+<div class="card"><div class="body" style="display:flex;gap:10px;flex-wrap:wrap"><input id="cName" placeholder="Nama kategori" style="max-width:220px"><input id="cDesc" placeholder="Deskripsi" style="flex:1;min-width:200px"><button class="btn btn-primary btn-sm" onclick="createCat()"><svg class="ic"><use href="#i-plus"/></svg> Tambah</button></div></div>
+<div class="table-wrap" style="margin-top:14px"><table><thead><tr><th>ID</th><th>Nama</th><th>Deskripsi</th><th>Aksi</th></tr></thead><tbody id="tb"></tbody></table></div></div></div>
+<script src="/static/js/icons.js"></script>
+<script src="/static/js/app.js"></script>
+<script>
+async function load(){
+  const r=await api('/api/categories');
+  document.getElementById('tb').innerHTML=(r.data||[]).map(c=>`<tr><td>${c.id}</td><td>${c.name}</td><td>${c.description||'-'}</td><td style="white-space:nowrap"><button class="btn btn-sm" onclick="edit(${c.id},'${c.name}','${(c.description||'').replace(/'/g,'')}')">Edit</button> <button class="btn btn-sm" onclick="del(${c.id})">Hapus</button></td></tr>`).join('');
+}
+async function createCat(){const r=await api('/api/categories',{method:'POST',body:JSON.stringify({name:cName.value,description:cDesc.value})});toast(r.message);if(r.success){cName.value='';cDesc.value='';load();}}
+async function edit(id,name,desc){const n=prompt('Nama kategori:',name);if(!n)return;const r=await api('/api/categories/'+id,{method:'PUT',body:JSON.stringify({name:n,description:desc})});toast(r.message);load();}
+async function del(id){confirmModal('Hapus kategori ini?',async()=>{const r=await api('/api/categories/'+id,{method:'DELETE'});toast(r.message);load();});}
+load();
+</script></body></html>
